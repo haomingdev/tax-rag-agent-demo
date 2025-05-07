@@ -11,31 +11,31 @@ Each phase includes development steps and corresponding Jest unit tests.
 **Phase 0: Project Setup & Foundational Configuration**
 - [x] **P0.1**: Initialize Monorepo structure (e.g., using Turborepo or Lerna, or simple yarn/npm workspaces).
   - [x] Create `apps/frontend` (Next.js) and `apps/backend` (NestJS) directories.
-- [] **P0.2**: Initialize Next.js frontend project (`apps/frontend`).
-  - [] Setup with TypeScript, Tailwind CSS, Shadcn/UI.
-  - [] Configure ESLint, Prettier.
-  - [] Configure Jest for unit testing.
-    - [] Write a sample Jest test for a simple component.
-    - [] Run tests (e.g., `npm run test` or `yarn test`) and ensure the sample test passes.
-- [ ] **P0.3**: Initialize NestJS backend project (`apps/backend`).
-  - [ ] Setup with TypeScript.
-  - [ ] Configure ESLint, Prettier.
-  - [ ] Configure Jest for unit testing.
-    - [ ] Write a sample Jest test for a simple service.
-    - [ ] Run tests (e.g., `npm run test` or `yarn test`) and ensure the sample test passes.
-- [ ] **P0.4**: Setup Docker Compose for local development.
-  - [ ] Add Weaviate service (referencing `database.md` for schema version, vectorizer 'none').
-  - [ ] Add Redis service (for BullMQ).
-  - [ ] Ensure Docker services are configurable and can start up correctly.
-- [ ] **P0.5**: Configure environment variables for the backend.
-  - [ ] Setup `.env` file for `GEMINI_API_KEY`.
-  - [ ] Setup configurations for Weaviate connection (URL, scheme).
-  - [ ] Setup configurations for Redis connection.
-- [ ] **P0.6**: Backend: Implement Weaviate client and schema initialization.
-  - [ ] Create a Weaviate client service in NestJS.
-  - [ ] Implement logic to create the schema (classes: `IngestJob`, `RawDoc`, `DocChunk`, `ChatInteraction` as per `database.md`) if it doesn't exist on application startup.
-    - [ ] Write Jest tests for schema initialization logic (mocking Weaviate client).
-    - [ ] Run tests (e.g., `npm run test` or `yarn test`) and ensure schema initialization tests pass.
+- [x] **P0.2**: Initialize Next.js frontend project (`apps/frontend`).
+  - [x] Setup with TypeScript, Tailwind CSS, Shadcn/UI.
+  - [x] Configure ESLint, Prettier.
+  - [x] Configure Jest for unit testing.
+    - [x] Write a sample Jest test for a simple component.
+    - [x] Run tests (e.g., `npm run test` or `yarn test`) and ensure the sample test passes.
+- [x] **P0.3**: Initialize NestJS backend project (`apps/backend`).
+  - [x] Setup with TypeScript.
+  - [x] Configure ESLint, Prettier.
+  - [x] Configure Jest for unit testing.
+    - [x] Write a sample Jest test for a simple service.
+    - [x] Run tests (e.g., `npm run test` or `yarn test`) and ensure the sample test passes.
+- [x] **P0.4**: Setup Docker Compose for local development.
+  - [x] Add Weaviate service (referencing `database.md` for schema version, vectorizer 'none').
+  - [x] Add Redis service (for BullMQ).
+  - [x] Ensure Docker services are configurable and can start up correctly.
+- [x] **P0.5**: Configure environment variables for the backend.
+  - [x] Setup `.env` file for `GEMINI_API_KEY`.
+  - [x] Setup configurations for Weaviate connection (URL, scheme).
+  - [x] Setup configurations for Redis connection.
+- [x] **P0.6**: Backend: Implement Weaviate client and schema initialization.
+  - [x] Create a Weaviate client service in NestJS.
+  - [x] Implement logic to create the schema (classes: `IngestJob`, `RawDoc`, `DocChunk`, `ChatInteraction` as per `database.md`) if it doesn't exist on application startup.
+    - [x] Write Jest tests for schema initialization logic (mocking Weaviate client).
+    - [x] Run tests (e.g., `npm run test` or `yarn test`) and ensure schema initialization tests pass.
 
 **Phase 1: Backend - Data Ingestion Pipeline**
 - [ ] **P1.1**: Define Data Transfer Objects (DTOs) for ingestion requests (e.g., URL to ingest).

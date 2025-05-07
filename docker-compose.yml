@@ -1,0 +1,77 @@
+version: '3.8'
+
+services:
+  frontend:
+    build:
+      context: ./apps/frontend
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./apps/frontend:/app
+      - /app/node_modules # Prevents host node_modules from overwriting container's
+      - /app/.next # Persist .next folder content
+    environment:
+      - NODE_ENV=development
+      - NEXT_PUBLIC_BACKEND_URL=http://localhost:3001/api # Assuming backend is exposed on host 3001
+    depends_on:
+      - backend
+    networks:
+      - tax_agent_network
+
+  backend:
+    build:
+      context: ./apps/backend
+      dockerfile: Dockerfile
+    ports:
+      - "3001:3000" # Host:Container - backend runs on 3000 inside container
+    volumes:
+      - ./apps/backend:/usr/src/app
+      - /usr/src/app/node_modules # Prevents host node_modules from overwriting container's
+    environment:
+      - NODE_ENV=development
+      - PORT=3000
+      - WEAVIATE_HOST=weaviate
+      - WEAVIATE_PORT=8080
+      - WEAVIATE_SCHEME=http
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - GOOGLE_GEMINI_API_KEY=${GOOGLE_GEMINI_API_KEY}
+    depends_on:
+      - weaviate
+      - redis
+    networks:
+      - tax_agent_network
+
+  weaviate:
+    image: semitechnologies/weaviate:1.25.0 # Using a specific version for stability
+    ports:
+      - "8080:8080"
+      - "50051:50051" # For gRPC if needed
+    volumes:
+      - weaviate_data:/var/lib/weaviate
+    environment:
+      AUTHENTICATION_ANONYMOUS_ACCESS_ENABLED: 'true'
+      PERSISTENCE_DATA_PATH: '/var/lib/weaviate'
+      DEFAULT_VECTORIZER_MODULE: 'none' # Using external embeddings (Gemini)
+      ENABLE_MODULES: '' # No specific modules enabled by default
+      CLUSTER_HOSTNAME: 'node1' # Recommended for Weaviate setup
+    networks:
+      - tax_agent_network
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - tax_agent_network
+
+volumes:
+  weaviate_data:
+  redis_data:
+
+networks:
+  tax_agent_network:
+    driver: bridge

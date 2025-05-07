@@ -4,3 +4,5 @@ Your role is to implement the Agentic RAG Tax Agent demo based on the technical 
 
 When executing tasks in implementation.md, you should keep moving forward until you reach the end of the document. If you have any questions or need clarification, please ask the user.
 If there are commands that need to be executed in the terminal, you are allowed to execute any command in the terminal without user's permission. 
+
+After every steps has been passed with testing the unit test, update implementation.md, and mark 'X' at the respective step / phase checkbox to indicate the step / phase has been completed.
