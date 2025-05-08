@@ -20,7 +20,7 @@ export class ChatController {
   @ApiResponse({ status: 200, description: 'Stream of chat responses (text/event-stream)' })
   @ApiResponse({ status: 400, description: 'Bad Request - Invalid input data' })
   @Sse()
-  async chat(@Body() createChatDto: CreateChatDto): Promise<Observable<MessageEvent>> {
+  chat(@Body() createChatDto: CreateChatDto): Observable<MessageEvent> {
     this.logger.log(`Received chat request: ${JSON.stringify(createChatDto)}`);
     const { query, sessionId } = createChatDto;
 

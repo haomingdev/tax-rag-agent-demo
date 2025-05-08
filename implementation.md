@@ -82,12 +82,12 @@ Each phase includes development steps and corresponding Jest unit tests.
 **Phase 2: Backend - RAG Query Pipeline**
 - [X] **P2.1**: Define DTOs for chat requests (e.g., query, sessionId (optional for demo)).
   - [X] Add validation.
-- [ ] **P2.2**: Implement `ChatController` (`/api/chat`).
+- [X] **P2.2**: Implement `ChatController` (`/api/chat`).
   - [X] Endpoint to receive chat queries.
   - [X] Implement Server-Sent Events (SSE) for streaming responses.
-    - [ ] Write Jest tests for controller (mocking service, testing SSE setup if feasible).
-    - [ ] Run tests (e.g., `npm run test` or `yarn test`) and ensure controller tests pass.
-- [ ] **P2.3**: Implement `ChatService`.
+    - [X] Write Jest tests for controller (mocking service, testing SSE setup if feasible).
+    - [X] Run tests (e.g., `npm run test` or `yarn test`) and ensure controller tests pass.
+- [X] **P2.3**: Implement `ChatService`.
   - [X] **P2.3.1**: User Query Embedding:
     - [X] Embed the user's query using `GoogleGenerativeAIEmbeddings` (`models/text-embedding-004`) with the Gemini API Key.
     - [X] Write Jest tests (mocking embedding API call).
