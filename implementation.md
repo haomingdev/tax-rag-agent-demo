@@ -110,16 +110,16 @@ Each phase includes development steps and corresponding Jest unit tests.
     - [X] Run tests (e.g., `npm run test` or `yarn test`) and ensure chat interaction storage tests pass.
 
 **Phase 3: Frontend - User Interface (Next.js)**
-- [ ] **P3.1**: Implement API Client Utility.
-  - [ ] Utility functions to call backend `/api/ingest` and `/api/chat` endpoints.
-    - [ ] Write Jest tests for API client utility (mocking `fetch`).
-    - [ ] Run tests (e.g., `npm run test` or `yarn test`) and ensure API client tests pass.
-- [ ] **P3.2**: Create Ingestion Page (`/ingest` or `/dev-ingest`).
-  - [ ] UI with URL input field and submit button.
-  - [ ] Display feedback to the user (e.g., 'Ingesting...', 'Success!', 'Error: ...').
-  - [ ] Call `/api/ingest` endpoint.
-    - [ ] Write Jest tests for Ingestion Page components and logic (mocking API client).
-    - [ ] Run tests (e.g., `npm run test` or `yarn test`) and ensure Ingestion Page tests pass.
+- [X] **P3.1**: Implement API Client Utility.
+  - [X] Utility functions to call backend `/api/ingest` and `/api/chat` endpoints.
+    - [X] Write Jest tests for API client utility (mocking `fetch`).
+    - [X] Run tests (e.g., `npm run test` or `yarn test`) and ensure API client tests pass.
+- [X] **P3.2**: Create Ingestion Page (`/ingest` or `/dev-ingest`).
+  - [X] UI with URL input field and submit button.
+  - [X] Display feedback to the user (e.g., 'Ingesting...', 'Success!', 'Error: ...').
+  - [X] Call `/api/ingest` endpoint.
+    - [X] Write Jest tests for Ingestion Page components and logic (mocking API client).
+    - [X] Run tests (e.g., `npm run test` or `yarn test`) and ensure Ingestion Page tests pass.
 - [ ] **P3.3**: Create Chat Page (`/` or `/chat`).
   - [ ] UI with chat input field and send button.
   - [ ] Display chat history (user queries and streamed LLM responses).
