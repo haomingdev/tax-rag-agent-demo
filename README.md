@@ -28,6 +28,18 @@ This project is a demonstration of an Agentic Retrieval Augmented Generation (RA
     Create a `.env` file in the project root directory (`/tax-rag-agent-demo/.env`):
     ```env
     GEMINI_API_KEY=your_gemini_api_key_here
+    GOOGLE_GEMINI_API_KEY=your_gemini_api_key_here
+
+    # Weaviate Connection Details
+    WEAVIATE_SCHEME=http
+    WEAVIATE_HOST=localhost
+    WEAVIATE_PORT=8080
+    # WEAVIATE_API_KEY=your-weaviate-api-key # Uncomment and set if auth is enabled
+
+    # Redis Connection Details
+    REDIS_HOST=localhost
+    REDIS_PORT=6379
+    # REDIS_PASSWORD= # Only if your Redis instance requires a password
     ```
     Replace `your_gemini_api_key_here` with your actual Google Gemini API Key.
 
