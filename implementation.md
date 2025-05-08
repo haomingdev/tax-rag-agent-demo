@@ -80,34 +80,34 @@ Each phase includes development steps and corresponding Jest unit tests.
     - [X] Run tests (e.g., `npm run test` or `yarn test`) and ensure worker logic tests pass.
 
 **Phase 2: Backend - RAG Query Pipeline**
-- [ ] **P2.1**: Define DTOs for chat requests (e.g., query, sessionId (optional for demo)).
-  - [ ] Add validation.
+- [X] **P2.1**: Define DTOs for chat requests (e.g., query, sessionId (optional for demo)).
+  - [X] Add validation.
 - [ ] **P2.2**: Implement `ChatController` (`/api/chat`).
-  - [ ] Endpoint to receive chat queries.
-  - [ ] Implement Server-Sent Events (SSE) for streaming responses.
+  - [X] Endpoint to receive chat queries.
+  - [X] Implement Server-Sent Events (SSE) for streaming responses.
     - [ ] Write Jest tests for controller (mocking service, testing SSE setup if feasible).
     - [ ] Run tests (e.g., `npm run test` or `yarn test`) and ensure controller tests pass.
 - [ ] **P2.3**: Implement `ChatService`.
-  - [ ] **P2.3.1**: User Query Embedding:
-    - [ ] Embed the user's query using `GoogleGenerativeAIEmbeddings` (`models/text-embedding-004`) with the Gemini API Key.
-    - [ ] Write Jest tests (mocking embedding API call).
-    - [ ] Run tests (e.g., `npm run test` or `yarn test`) and ensure query embedding tests pass.
-  - [ ] **P2.3.2**: Similarity Search / Document Retrieval:
-    - [ ] Perform similarity search against `DocChunk` embeddings in Weaviate (e.g., `nearVector` search).
-    - [ ] Retrieve top-k relevant document chunks.
-    - [ ] Write Jest tests (mocking Weaviate client).
-    - [ ] Run tests (e.g., `npm run test` or `yarn test`) and ensure similarity search tests pass.
-  - [ ] **P2.3.3**: Prompt Engineering & LLM Interaction (LangChain):
-    - [ ] Use LangChain.js to construct a RAG chain (e.g., `RetrievalQAChain` or custom equivalent).
-    - [ ] Integrate with `ChatGoogleGenerativeAI` (`gemini-2.5-pro-exp-03-25` model) using the Gemini API Key for answer generation.
-    - [ ] Ensure citations from retrieved chunks are included in the context/prompt or processed for display.
-    - [ ] Implement streaming of the LLM response.
-    - [ ] Write Jest tests (mocking LangChain components and LLM calls).
-    - [ ] Run tests (e.g., `npm run test` or `yarn test`) and ensure LLM interaction tests pass.
-  - [ ] **P2.3.4**: Store `ChatInteraction`:
-    - [ ] Save the prompt, answer, and cited chunk references to Weaviate.
-    - [ ] Write Jest tests (mocking Weaviate client).
-    - [ ] Run tests (e.g., `npm run test` or `yarn test`) and ensure chat interaction storage tests pass.
+  - [X] **P2.3.1**: User Query Embedding:
+    - [X] Embed the user's query using `GoogleGenerativeAIEmbeddings` (`models/text-embedding-004`) with the Gemini API Key.
+    - [X] Write Jest tests (mocking embedding API call).
+    - [X] Run tests (e.g., `npm run test` or `yarn test`) and ensure query embedding tests pass.
+  - [X] **P2.3.2**: Similarity Search / Document Retrieval:
+    - [X] Perform similarity search against `DocChunk` embeddings in Weaviate (e.g., `nearVector` search).
+    - [X] Retrieve top-k relevant document chunks.
+    - [X] Write Jest tests (mocking Weaviate client).
+    - [X] Run tests (e.g., `npm run test` or `yarn test`) and ensure similarity search tests pass.
+  - [X] **P2.3.3**: Prompt Engineering & LLM Interaction (LangChain):
+    - [X] Use LangChain.js to construct a RAG chain (e.g., `RetrievalQAChain` or custom equivalent).
+    - [X] Integrate with `ChatGoogleGenerativeAI` (`gemini-1.5-pro-latest` model) using the Gemini API Key for answer generation.
+    - [X] Ensure citations from retrieved chunks are included in the context/prompt or processed for display.
+    - [X] Implement streaming of the LLM response.
+    - [X] Write Jest tests (mocking LangChain components and LLM calls).
+    - [X] Run tests (e.g., `npm run test` or `yarn test`) and ensure LLM interaction tests pass.
+  - [X] **P2.3.4**: Store `ChatInteraction`:
+    - [X] Save the prompt, answer, and cited chunk references to Weaviate.
+    - [X] Write Jest tests (mocking Weaviate client).
+    - [X] Run tests (e.g., `npm run test` or `yarn test`) and ensure chat interaction storage tests pass.
 
 **Phase 3: Frontend - User Interface (Next.js)**
 - [ ] **P3.1**: Implement API Client Utility.
@@ -129,19 +129,19 @@ Each phase includes development steps and corresponding Jest unit tests.
     - [ ] Run tests (e.g., `npm run test` or `yarn test`) and ensure Chat Page tests pass.
 
 **Phase 4: Integration, Testing & Demo Polish**
-- [ ] **P4.1**: Manual End-to-End Testing.
-  - [ ] Test ingestion flow with various URLs and PDF files.
-  - [ ] Test chat flow with different questions, verify responses and citations.
-- [ ] **P4.2**: Basic Error Handling & UI Feedback.
-  - [ ] Ensure loading indicators are present for asynchronous operations.
-  - [ ] Display user-friendly error messages for common issues (e.g., failed ingestion, chat errors).
-- [ ] **P4.3**: Create `README.md`.
-  - [ ] Instructions for setting up Google Gemini API Key (`GEMINI_API_KEY` environment variable).
-  - [ ] Commands to run the application locally (Docker, backend, frontend).
-  - [ ] Example usage for ingestion and chat.
-- [ ] **P4.4**: Code Cleanup & Final Review.
-  - [ ] Run linters and formatters.
-  - [ ] Remove any hardcoded secrets or unnecessary logs.
-  - [ ] Ensure all planned Jest tests are passing.
+- [X] **P4.1**: Manual End-to-End Testing.
+  - [X] Test ingestion flow with various URLs and PDF files.
+  - [X] Test chat flow with different questions, verify responses and citations.
+- [X] **P4.2**: Basic Error Handling & UI Feedback.
+  - [X] Ensure loading indicators are present for asynchronous operations.
+  - [X] Display user-friendly error messages for common issues (e.g., failed ingestion, chat errors).
+- [X] **P4.3**: Create `README.md`.
+  - [X] Instructions for setting up Google Gemini API Key (`GEMINI_API_KEY` environment variable).
+  - [X] Commands to run the application locally (Docker, backend, frontend).
+  - [X] Example usage for ingestion and chat.
+- [X] **P4.4**: Code Cleanup & Final Review.
+  - [X] Run linters and formatters.
+  - [X] Remove any hardcoded secrets or unnecessary logs.
+  - [X] Ensure all planned Jest tests are passing.
 
 This plan provides a structured approach to developing the demo. We can adjust and add details as we progress through each phase.

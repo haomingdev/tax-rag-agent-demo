@@ -5,6 +5,7 @@ import { WeaviateModule } from './weaviate/weaviate.module';
 import { ConfigModule } from '@nestjs/config';
 import { DocumentIngestionModule } from './document-ingestion/document-ingestion.module';
 import { IngestionModule } from './ingestion/ingestion.module';
+import { ChatModule } from './chat/chat.module';
 
 @Module({
   imports: [
@@ -15,6 +16,7 @@ import { IngestionModule } from './ingestion/ingestion.module';
     WeaviateModule,
     DocumentIngestionModule,
     IngestionModule,
+    ChatModule,
   ],
   controllers: [AppController],
   providers: [AppService],
