@@ -49,7 +49,7 @@ Each phase includes development steps and corresponding Jest unit tests.
   - [x] Configure queue and worker processes in NestJS.
     - [x] Write Jest tests for queue setup and job addition (mocking BullMQ).
     - [x] Run tests (e.g., `npm run test` or `yarn test`) and ensure queue tests pass.
-- [ ] **P1.4**: Implement `IngestionService` (Core Logic - to be called by BullMQ worker).
+- [x] **P1.4**: Implement `IngestionService` (Core Logic - to be called by BullMQ worker).
   - [x] Method to add jobs to the BullMQ queue (this might already be in controller, decide if service layer is needed for this simple step or if controller directly uses queue).
   - [x] **P1.4.1**: Content Fetching:
     - [x] Implement fetching HTML content using Playwright.
@@ -74,10 +74,10 @@ Each phase includes development steps and corresponding Jest unit tests.
     - [X] Update `IngestJob` status (pending, processing, completed, failed) in Weaviate.
     - [X] Write Jest tests for data storage (mocking Weaviate client).
     - [X] Run tests (e.g., `npm run test` or `yarn test`) and ensure data storage tests pass.
-- [ ] **P1.5**: Implement BullMQ Worker to process ingestion jobs using `IngestionService`.
-  - [ ] Handle job success and failure, update `IngestJob` status.
-    - [ ] Write Jest tests for the worker logic (mocking `IngestionService`).
-    - [ ] Run tests (e.g., `npm run test` or `yarn test`) and ensure worker logic tests pass.
+- [X] **P1.5**: Implement BullMQ Worker to process ingestion jobs using `IngestionService`.
+  - [X] Handle job success and failure, update `IngestJob` status.
+    - [X] Write Jest tests for the worker logic (mocking `IngestionService`).
+    - [X] Run tests (e.g., `npm run test` or `yarn test`) and ensure worker logic tests pass.
 
 **Phase 2: Backend - RAG Query Pipeline**
 - [ ] **P2.1**: Define DTOs for chat requests (e.g., query, sessionId (optional for demo)).

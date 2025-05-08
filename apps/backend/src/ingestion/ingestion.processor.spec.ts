@@ -50,7 +50,7 @@ describe('IngestionProcessor', () => {
     expect(processor).toBeDefined();
   });
 
-  describe('handleIngestion', () => {
+  describe('process', () => {
     const mockJobData: IngestionJobData = {
       url: 'http://example.com',
       weaviateJobId: 'test-job-id',
@@ -64,13 +64,13 @@ describe('IngestionProcessor', () => {
     it('should call ingestionService.processUrlForIngestion with job data and log success', async () => {
       mockIngestionService.processUrlForIngestion.mockResolvedValue(undefined);
 
-      await processor.handleIngestion(mockJob);
+      await processor.process(mockJob);
 
       expect(mockIngestionService.processUrlForIngestion).toHaveBeenCalledWith(mockJobData);
       expect(mockLogger.log).toHaveBeenCalledWith(
         `Processing job ${mockJob.id} of type ${mockJob.name} with data: ${JSON.stringify(mockJob.data)} for queue ingestion`,
       );
-      expect(mockLogger.log).toHaveBeenCalledWith(`Job ${mockJob.id} completed successfully.`);
+      expect(mockLogger.log).toHaveBeenCalledWith(`Job ${mockJob.id} ('${mockJob.name}') completed successfully.`);
       expect(mockLogger.error).not.toHaveBeenCalled();
     });
 
@@ -79,16 +79,35 @@ describe('IngestionProcessor', () => {
       const expectedError = new Error(errorMessage);
       mockIngestionService.processUrlForIngestion.mockRejectedValue(expectedError);
 
-      await expect(processor.handleIngestion(mockJob)).rejects.toThrow(expectedError);
+      await expect(processor.process(mockJob)).rejects.toThrow(expectedError);
 
       expect(mockIngestionService.processUrlForIngestion).toHaveBeenCalledWith(mockJobData);
       expect(mockLogger.log).toHaveBeenCalledWith(
         `Processing job ${mockJob.id} of type ${mockJob.name} with data: ${JSON.stringify(mockJob.data)} for queue ingestion`,
       );
       expect(mockLogger.error).toHaveBeenCalledWith(
-        `Job ${mockJob.id} failed with error: ${errorMessage}`,
+        `Job ${mockJob.id} ('${mockJob.name}') failed with error: ${errorMessage}`,
         expectedError.stack,
       );
+    });
+
+    it('should log a warning if job name is not ingestUrl', async () => {
+      const differentJob = createMock<Job<IngestionJobData>>({
+        id: '456',
+        name: 'otherJobType', // Different job name
+        data: mockJobData,
+      });
+
+      await processor.process(differentJob);
+
+      expect(mockIngestionService.processUrlForIngestion).not.toHaveBeenCalled();
+      expect(mockLogger.log).toHaveBeenCalledWith(
+        `Processing job ${differentJob.id} of type ${differentJob.name} with data: ${JSON.stringify(differentJob.data)} for queue ingestion`,
+      );
+      expect(mockLogger.warn).toHaveBeenCalledWith(
+        `Job ${differentJob.id} has unexpected name '${differentJob.name}'. Skipping.`,
+      );
+      expect(mockLogger.error).not.toHaveBeenCalled();
     });
   });
 });
