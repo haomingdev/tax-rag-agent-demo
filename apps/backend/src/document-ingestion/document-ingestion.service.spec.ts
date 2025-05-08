@@ -3,6 +3,7 @@ import { DocumentIngestionService } from './document-ingestion.service';
 import { WeaviateService } from '../weaviate/weaviate.service';
 import { v4 as uuidv4 } from 'uuid';
 import { Logger } from '@nestjs/common';
+import { jest, describe, beforeEach, it, expect, afterEach } from '@jest/globals';
 
 // Mock Weaviate client methods
 const mockWeaviateClient = {
@@ -12,7 +13,7 @@ const mockWeaviateClient = {
     withClassName: jest.fn().mockReturnThis(),
     withId: jest.fn().mockReturnThis(),
     withObject: jest.fn().mockReturnThis(),
-    do: jest.fn().mockResolvedValue(undefined), // Default successful 'do'
+    do: jest.fn<() => Promise<any>>().mockResolvedValue(undefined), // Default successful 'do'
   },
 };
 

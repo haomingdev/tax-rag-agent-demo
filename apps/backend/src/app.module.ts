@@ -4,15 +4,17 @@ import { AppService } from './app.service';
 import { WeaviateModule } from './weaviate/weaviate.module';
 import { ConfigModule } from '@nestjs/config';
 import { DocumentIngestionModule } from './document-ingestion/document-ingestion.module';
+import { IngestionModule } from './ingestion/ingestion.module';
 
 @Module({
   imports: [
     ConfigModule.forRoot({
-      isGlobal: true, // Makes ConfigService available application-wide
-      envFilePath: '.env', // Specifies the .env file path in the project root
+      isGlobal: true, 
+      envFilePath: '.env', 
     }),
     WeaviateModule,
     DocumentIngestionModule,
+    IngestionModule,
   ],
   controllers: [AppController],
   providers: [AppService],

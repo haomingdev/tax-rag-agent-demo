@@ -38,28 +38,29 @@ Each phase includes development steps and corresponding Jest unit tests.
     - [x] Run tests (e.g., `npm run test` or `yarn test`) and ensure schema initialization tests pass.
 
 **Phase 1: Backend - Data Ingestion Pipeline**
-- [ ] **P1.1**: Define Data Transfer Objects (DTOs) for ingestion requests (e.g., URL to ingest).
-  - [ ] Add validation (e.g., using `class-validator`).
-- [ ] **P1.2**: Implement `IngestionController` (`/api/ingest`).
-  - [ ] Endpoint to receive ingestion requests.
-  - [ ] Add basic request validation.
-    - [ ] Write Jest tests for controller (mocking service).
-    - [ ] Run tests (e.g., `npm run test` or `yarn test`) and ensure controller tests pass.
-- [ ] **P1.3**: Setup BullMQ for asynchronous ingestion tasks.
-  - [ ] Configure queue and worker processes in NestJS.
-    - [ ] Write Jest tests for queue setup and job addition (mocking BullMQ).
-    - [ ] Run tests (e.g., `npm run test` or `yarn test`) and ensure queue tests pass.
+- [x] **P1.1**: Define Data Transfer Objects (DTOs) for ingestion requests (e.g., URL to ingest).
+  - [x] Add validation (e.g., using `class-validator`).
+- [x] **P1.2**: Implement `IngestionController` (`/api/ingest`).
+  - [x] Endpoint to receive ingestion requests.
+  - [x] Add basic request validation.
+    - [x] Write Jest tests for controller (mocking service).
+    - [x] Run tests (e.g., `npm run test` or `yarn test`) and ensure controller tests pass.
+- [x] **P1.3**: Setup BullMQ for asynchronous ingestion tasks.
+  - [x] Configure queue and worker processes in NestJS.
+    - [x] Write Jest tests for queue setup and job addition (mocking BullMQ).
+    - [x] Run tests (e.g., `npm run test` or `yarn test`) and ensure queue tests pass.
 - [ ] **P1.4**: Implement `IngestionService` (Core Logic - to be called by BullMQ worker).
-  - [ ] **P1.4.1**: Content Fetching:
-    - [ ] Implement fetching HTML content using Playwright.
-    - [ ] Implement fetching PDF content using `pdf-parse`.
-    - [ ] Write Jest tests for content fetching (mocking external libraries).
-    - [ ] Run tests (e.g., `npm run test` or `yarn test`) and ensure content fetching tests pass.
-  - [ ] **P1.4.2**: Text Parsing & Cleaning:
-    - [ ] Implement HTML to text conversion (e.g., using `html-to-text` or `@extractus/article-extractor`).
-    - [ ] Basic text cleaning.
-    - [ ] Write Jest tests for text parsing and cleaning.
-    - [ ] Run tests (e.g., `npm run test` or `yarn test`) and ensure text parsing/cleaning tests pass.
+  - [x] Method to add jobs to the BullMQ queue (this might already be in controller, decide if service layer is needed for this simple step or if controller directly uses queue).
+  - [x] **P1.4.1**: Content Fetching:
+    - [x] Implement fetching HTML content using Playwright.
+    - [x] Implement fetching PDF content using `pdf-parse`.
+    - [x] Write Jest tests for content fetching (mocking external libraries).
+    - [x] Run tests (e.g., `npm run test` or `yarn test`) and ensure content fetching tests pass.
+  - [x] **P1.4.2**: Text Parsing & Cleaning:
+    - [x] Implement HTML to text conversion (e.g., using `html-to-text` or `@extractus/article-extractor`).
+    - [x] Basic text cleaning.
+    - [x] Write Jest tests for text parsing and cleaning.
+    - [x] Run tests (e.g., `npm run test` or `yarn test`) and ensure text parsing/cleaning tests pass.
   - [ ] **P1.4.3**: Text Chunking:
     - [ ] Implement text chunking using LangChain text splitters (e.g., `RecursiveCharacterTextSplitter`).
     - [ ] Write Jest tests for text chunking.
