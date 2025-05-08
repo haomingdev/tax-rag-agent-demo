@@ -269,7 +269,7 @@ export class IngestionService {
       }
       this.serviceLogger.log(`Embeddings generated for IngestJob ${weaviateJobId}. Count: ${embeddings.length}.`);
 
-      // 3. Create ContentChunk objects in Weaviate (batch operation)
+      // 3. Create DocChunk objects in Weaviate (batch operation)
       const createChunkPromises = chunks.map((chunkText, index) => {
         const chunkId = uuidv4();
         const chunkProperties = {
@@ -282,7 +282,7 @@ export class IngestionService {
           // vector: embeddings[index], // Weaviate handles auto-vectorization if module is configured
         };
         return this.weaviateService.createObject(
-          'ContentChunk',
+          'DocChunk',
           chunkProperties,
           chunkId,
           embeddings[index], // Pass vector here for manual vectorization
@@ -290,7 +290,7 @@ export class IngestionService {
       });
 
       await Promise.all(createChunkPromises);
-      this.serviceLogger.log(`All ${chunks.length} ContentChunk objects created for IngestJob ${weaviateJobId}.`);
+      this.serviceLogger.log(`All ${chunks.length} DocChunk objects created for IngestJob ${weaviateJobId}.`);
 
       // 4. Update IngestJob status to 'completed'
       await this.weaviateService.updateObject('IngestJob', weaviateJobId, {
@@ -306,9 +306,9 @@ export class IngestionService {
       );
       // Determine a more specific error message if possible
       let finalErrorMessage = error.message || 'An unexpected error occurred during ingestion.';
-      if (error.message && error.message.includes('Weaviate createObject for ContentChunk failed')) { // Check if it's our specific error for ContentChunk
-        finalErrorMessage = `Error creating ContentChunk in Weaviate: ${error.message}`; // Keep original for a bit more detail
-      } else if (error.message && error.message.includes('Weaviate createObject failed')) { // Generic createObject failure
+      if (error.message && error.message.includes('Weaviate createObject for DocChunk failed')) { 
+        finalErrorMessage = `Error creating DocChunk in Weaviate: ${error.message}`; 
+      } else if (error.message && error.message.includes('Weaviate createObject failed')) { 
          finalErrorMessage = `Error creating an object in Weaviate: ${error.message}`;
       }
 

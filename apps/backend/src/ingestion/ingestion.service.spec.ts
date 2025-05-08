@@ -276,7 +276,7 @@ describe('IngestionService', () => {
       });
       // Mock for ContentChunk creation
       mockWeaviateService.createObject.mockImplementationOnce(async (className, properties, id, vector) => {
-        expect(className).toBe('ContentChunk');
+        expect(className).toBe('DocChunk');
         expect(properties).toEqual(expect.objectContaining({
           text: MOCK_EXTRACTED_TEXT.substring(0, 1000),
           docTitle: MOCK_ARTICLE_TITLE_VAL,
@@ -295,7 +295,7 @@ describe('IngestionService', () => {
       expect(mockedExtract).toHaveBeenCalledWith(MOCK_HTML_CONTENT);
       expect(generateEmbeddingsSpy).toHaveBeenCalledWith([MOCK_EXTRACTED_TEXT.substring(0, 1000)]); 
       
-      expect(mockWeaviateService.createObject).toHaveBeenCalledTimes(2); // RawDoc + ContentChunk
+      expect(mockWeaviateService.createObject).toHaveBeenCalledTimes(2); // RawDoc + DocChunk
       expect(mockWeaviateService.updateObject).toHaveBeenLastCalledWith(
         'IngestJob',
         MOCK_JOB_ID,

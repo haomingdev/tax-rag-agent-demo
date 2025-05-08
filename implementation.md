@@ -69,9 +69,9 @@ Each phase includes development steps and corresponding Jest unit tests.
     - [X] Implement embedding generation for text chunks using `GoogleGenerativeAIEmbeddings` (`models/text-embedding-004`) with the Gemini API Key.
     - [X] Write Jest tests for embedding generation (mocking the embedding API call).
     - [X] Run tests (e.g., `npm run test` or `yarn test`) and ensure embedding generation tests pass.
-  - [ ] **P1.4.5**: Data Storage:
-    - [ ] Implement logic to store `IngestJob`, `RawDoc`, and `DocChunk` (with embeddings) in Weaviate.
-    - [ ] Update `IngestJob` status (pending, processing, completed, failed) in Weaviate.
+  - [X] **P1.4.5**: Data Storage:
+    - [X] Implement logic to store `IngestJob`, `RawDoc`, and `DocChunk` (with embeddings) in Weaviate.
+    - [X] Update `IngestJob` status (pending, processing, completed, failed) in Weaviate.
     - [X] Write Jest tests for data storage (mocking Weaviate client).
     - [X] Run tests (e.g., `npm run test` or `yarn test`) and ensure data storage tests pass.
 - [ ] **P1.5**: Implement BullMQ Worker to process ingestion jobs using `IngestionService`.
