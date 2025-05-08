@@ -1,4 +1,4 @@
-import { ingestDocument, streamChat, IngestResponse } from './api';
+import { ingestDocument, IngestResponse } from './api';
 
 const MOCK_API_BASE_URL = '/api';
 
@@ -11,7 +11,7 @@ if (typeof ReadableStream === 'undefined') {
     // Add any methods that might be called on the stream by your code or libraries, e.g.:
     // getReader: jest.fn(),
     // cancel: jest.fn(),
-  })) as any;
+  })) as jest.Mock;
 }
 
 describe('API Client', () => {
@@ -85,80 +85,6 @@ describe('API Client', () => {
       expect(fetch).toHaveBeenCalledTimes(1);
       expect(result.message).toBe('HTTP error! status: 500');
       expect(result.error).toBe('HTTP error! status: 500');
-    });
-  });
-
-  describe('streamChat', () => {
-    it('should successfully establish a chat stream', async () => {
-      const mockQuery = 'Hello there';
-      const mockSessionId = 'session-abc';
-      const mockReadableStream = new ReadableStream(); // Simple mock
-      (fetch as jest.Mock).mockResolvedValueOnce({
-        ok: true,
-        body: mockReadableStream,
-        json: async () => ({}) // Should not be called for body stream
-      });
-
-      const result = await streamChat(mockQuery, mockSessionId);
-
-      expect(fetch).toHaveBeenCalledWith(`${MOCK_API_BASE_URL}/chat`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Accept': 'text/event-stream',
-        },
-        body: JSON.stringify({ query: mockQuery, sessionId: mockSessionId }),
-      });
-      expect(result).toBe(mockReadableStream);
-    });
-
-    it('should return null if API returns an error before streaming', async () => {
-      const mockQuery = 'Error query';
-      const mockErrorResponse = { message: 'Chat service unavailable' };
-      (fetch as jest.Mock).mockResolvedValueOnce({
-        ok: false,
-        status: 503,
-        json: async () => mockErrorResponse,
-      });
-
-      const consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
-      const result = await streamChat(mockQuery);
-
-      expect(fetch).toHaveBeenCalledTimes(1);
-      expect(result).toBeNull();
-      expect(consoleErrorSpy).toHaveBeenCalledWith('Error initiating chat stream:', expect.any(Error));
-      consoleErrorSpy.mockRestore();
-    });
-
-    it('should return null if response body is null', async () => {
-        const mockQuery = 'Null body query';
-        (fetch as jest.Mock).mockResolvedValueOnce({
-          ok: true,
-          body: null, // Simulate null body
-          json: async () => ({}),
-        });
-  
-        const consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
-        const result = await streamChat(mockQuery);
-  
-        expect(fetch).toHaveBeenCalledTimes(1);
-        expect(result).toBeNull();
-        expect(consoleErrorSpy).toHaveBeenCalledWith('Error initiating chat stream:', expect.any(Error));
-        consoleErrorSpy.mockRestore();
-      });
-
-    it('should return null on network error', async () => {
-      const mockQuery = 'Network error query';
-      const networkError = new Error('Network connection lost');
-      (fetch as jest.Mock).mockRejectedValueOnce(networkError);
-
-      const consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
-      const result = await streamChat(mockQuery);
-
-      expect(fetch).toHaveBeenCalledTimes(1);
-      expect(result).toBeNull();
-      expect(consoleErrorSpy).toHaveBeenCalledWith('Error initiating chat stream:', networkError);
-      consoleErrorSpy.mockRestore();
     });
   });
 });

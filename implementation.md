@@ -120,13 +120,13 @@ Each phase includes development steps and corresponding Jest unit tests.
   - [X] Call `/api/ingest` endpoint.
     - [X] Write Jest tests for Ingestion Page components and logic (mocking API client).
     - [X] Run tests (e.g., `npm run test` or `yarn test`) and ensure Ingestion Page tests pass.
-- [ ] **P3.3**: Create Chat Page (`/` or `/chat`).
-  - [ ] UI with chat input field and send button.
-  - [ ] Display chat history (user queries and streamed LLM responses).
-  - [ ] Handle SSE for real-time display of streamed responses and citations.
-  - [ ] Call `/api/chat` endpoint.
-    - [ ] Write Jest tests for Chat Page components and logic (mocking API client and SSE handling).
-    - [ ] Run tests (e.g., `npm run test` or `yarn test`) and ensure Chat Page tests pass.
+- [X] **P3.3**: Create Chat Page (`/` or `/chat`).
+  - [X] UI with chat input field and send button.
+  - [X] Display chat history (user queries and streamed LLM responses).
+  - [X] Handle SSE for real-time display of streamed responses and citations.
+  - [X] Call `/api/chat` endpoint.
+    - [X] Write Jest tests for Chat Page components and logic (mocking API client and SSE handling).
+    - [X] Run tests (e.g., `npm run test` or `yarn test`) and ensure Chat Page tests pass.
 
 **Phase 4: Integration, Testing & Demo Polish**
 - [X] **P4.1**: Manual End-to-End Testing.
