@@ -13,10 +13,9 @@ import { v4 as uuidv4 } from 'uuid';
 interface DocChunkContext {
   id: string; 
   properties: {
-    content: string;
+    text: string;
     sourceUrl?: string;
     sourceTitle?: string;
-    pageNumber?: number;
   };
 }
 
@@ -75,7 +74,7 @@ export class ChatService {
             const searchResult = await client.graphql
               .get()
               .withClassName('DocChunk')
-              .withFields('content sourceUrl sourceTitle pageNumber _additional { id }')
+              .withFields('text _additional { id } docId { ... on RawDoc { sourceUrl title } }')
               .withNearVector({ vector: embedding })
               .withLimit(3)
               .do();
@@ -86,10 +85,9 @@ export class ChatService {
             const retrievedContext: DocChunkContext[] = searchResults.map(obj => ({
               id: obj._additional.id,
               properties: {
-                content: obj.content,
-                sourceUrl: obj.sourceUrl,
-                sourceTitle: obj.sourceTitle,
-                pageNumber: obj.pageNumber,
+                text: obj.text,
+                sourceUrl: obj.docId && obj.docId[0] ? obj.docId[0].sourceUrl : undefined,
+                sourceTitle: obj.docId && obj.docId[0] ? obj.docId[0].title : undefined,
               },
             }));
 
@@ -103,7 +101,7 @@ export class ChatService {
             }
 
             const formattedContext = retrievedContext
-              .map((doc, index) => `Source ${index + 1} (ID: ${doc.id}):\n${doc.properties.content}`)
+              .map((doc, index) => `Source ${index + 1} (ID: ${doc.id}):\n${doc.properties.text}`)
               .join('\n\n---\n\n');
 
             const promptTemplate = ChatPromptTemplate.fromMessages([
@@ -169,7 +167,6 @@ export class ChatService {
                   id: doc.id,
                   title: doc.properties.sourceTitle,
                   url: doc.properties.sourceUrl,
-                  pageNumber: doc.properties.pageNumber,
                 })),
               },
             });

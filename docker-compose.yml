@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   frontend:
     build:
@@ -37,6 +35,7 @@ services:
       - REDIS_HOST=redis
       - REDIS_PORT=6379
       - GOOGLE_GEMINI_API_KEY=${GOOGLE_GEMINI_API_KEY}
+      - GEMINI_API_KEY=${GEMINI_API_KEY}
     depends_on:
       - weaviate
       - redis
@@ -51,11 +50,11 @@ services:
     volumes:
       - weaviate_data:/var/lib/weaviate
     environment:
-      AUTHENTICATION_ANONYMOUS_ACCESS_ENABLED: 'true'
-      PERSISTENCE_DATA_PATH: '/var/lib/weaviate'
-      DEFAULT_VECTORIZER_MODULE: 'none' # Using external embeddings (Gemini)
-      ENABLE_MODULES: '' # No specific modules enabled by default
-      CLUSTER_HOSTNAME: 'node1' # Recommended for Weaviate setup
+      AUTHENTICATION_ANONYMOUS_ACCESS_ENABLED: "true"
+      PERSISTENCE_DATA_PATH: "/var/lib/weaviate"
+      DEFAULT_VECTORIZER_MODULE: "none" # Using external embeddings (Gemini)
+      ENABLE_MODULES: "" # No specific modules enabled by default
+      CLUSTER_HOSTNAME: "node1" # Recommended for Weaviate setup
     networks:
       - tax_agent_network
 

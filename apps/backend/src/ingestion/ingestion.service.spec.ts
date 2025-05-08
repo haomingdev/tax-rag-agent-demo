@@ -14,7 +14,8 @@ import { WeaviateService } from '../weaviate/weaviate.service';
 import { DeepMocked, createMock } from '@golevelup/ts-jest';
 import { mocked } from 'jest-mock';
 
-import { IngestionService, IngestionJobData, INGESTION_QUEUE_NAME } from './ingestion.service';
+import { IngestionService, INGESTION_QUEUE_NAME } from './ingestion.service';
+import { IngestionJobData } from '../ingestion/ingestion.types';
 
 const MOCK_UUID_VAL = 'mock-uuid-1234';
 const MOCK_PDF_TEXT_VAL = 'Extracted PDF text from mock.';
@@ -141,7 +142,7 @@ describe('IngestionService', () => {
   let jobDataPdf: IngestionJobData;
   let jobDataUnsupported: IngestionJobData;
 
-  describe('addIngestionJob', () => {
+  describe('addUrlToQueue', () => {
     const testUrl = 'http://example.com/article.html';
     const MOCK_JOB_ID_FROM_QUEUE = 'bull-job-id-5678';
 
@@ -167,7 +168,7 @@ describe('IngestionService', () => {
       // Ensure Weaviate createObject is appropriately mocked for this call path
       mockWeaviateService.createObject.mockResolvedValue(MOCK_UUID_VAL); 
 
-      const returnedJob = await service.addIngestionJob(testUrl);
+      const returnedJob = await service.addUrlToQueue(testUrl);
 
       expect(mockedUuidV4).toHaveBeenCalledTimes(1);
       expect(mockWeaviateService.createObject.mock.calls.length).toBe(1);
@@ -199,7 +200,7 @@ describe('IngestionService', () => {
       const weaviateError = new Error('Weaviate failed');
       mockWeaviateService.createObject.mockRejectedValue(weaviateError);
 
-      await expect(service.addIngestionJob(testUrl)).rejects.toThrow(weaviateError);
+      await expect(service.addUrlToQueue(testUrl)).rejects.toThrow(weaviateError);
       expect(mockLogger.error).toHaveBeenCalledWith(
         `Failed to create IngestJob in Weaviate or add to queue for URL ${testUrl}: ${weaviateError.message}`,
         expect.stringContaining(weaviateError.message)
@@ -211,7 +212,7 @@ describe('IngestionService', () => {
       const queueError = new Error('Queue add failed');
       mockIngestionQueue.add.mockRejectedValue(queueError);
 
-      await expect(service.addIngestionJob(testUrl)).rejects.toThrow(queueError);
+      await expect(service.addUrlToQueue(testUrl)).rejects.toThrow(queueError);
       expect(mockLogger.error).toHaveBeenCalledWith(
         `Failed to create IngestJob in Weaviate or add to queue for URL ${testUrl}: ${queueError.message}`,
         expect.stringContaining(queueError.message)
@@ -289,7 +290,8 @@ describe('IngestionService', () => {
       
       mockedUuidV4.mockReturnValueOnce(MOCK_RAW_DOC_ID).mockReturnValueOnce(MOCK_CHUNK_ID_2);
       
-      await service.processUrlForIngestion(jobDataHtml);
+      const mockJob = { data: jobDataHtml, id: 'mockJobId', name: 'ingestUrl' } as DeepMocked<Job<IngestionJobData>>;
+      await service.processUrlForIngestion(mockJob);
       
       expect(mockLogger.log).toHaveBeenCalledWith(expect.stringContaining(`Processing IngestJob ${MOCK_JOB_ID} for URL: ${MOCK_URL_HTML}`));
       expect(mockedExtract).toHaveBeenCalledWith(MOCK_HTML_CONTENT);

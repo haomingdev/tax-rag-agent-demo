@@ -5,12 +5,14 @@ import { IngestionController } from './ingestion.controller';
 import { IngestionService } from './ingestion.service'; 
 import { WeaviateModule } from '../weaviate/weaviate.module'; // Added import
 import { IngestionProcessor } from './ingestion.processor'; // For queue worker
+import { EmbeddingModule } from '../embedding/embedding.module'; // Added import for EmbeddingModule
 
-export const INGESTION_QUEUE_NAME = 'ingestion';
+export const INGESTION_QUEUE_NAME = 'ingestion-queue';
 
 @Module({
   imports: [
     WeaviateModule, // Added WeaviateModule
+    EmbeddingModule, // Added EmbeddingModule to imports
     // ConfigModule, // Removed as ConfigModule is global in AppModule
     BullModule.forRootAsync({
       imports: [ConfigModule], // Still need ConfigModule here for useFactory's DI context if not implicitly available

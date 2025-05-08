@@ -56,3 +56,9 @@ Thumbs.db
 
 # Docker
 .Dockerfile
+
+# Build output
+dist/
+**/dist/
+build/
+**/build/

@@ -123,7 +123,7 @@ export class WeaviateService implements OnModuleInit {
           { name: 'userSessionId', dataType: ['text'], description: 'Frontend session token' },
           { name: 'prompt', dataType: ['text'], description: 'User prompt' },
           { name: 'answer', dataType: ['text'], description: 'Assistant answer' },
-          { name: 'citations', dataType: ['DocChunk[]'], description: 'Chunks cited' },
+          { name: 'citations', dataType: ['DocChunk'], description: 'Chunks cited' },
           { name: 'askedAt', dataType: ['date'], description: 'Timestamp' },
         ],
         vectorizer: 'none',

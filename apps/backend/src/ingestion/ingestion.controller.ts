@@ -22,7 +22,7 @@ export class IngestionController {
       `Received ingestion request for URL: ${ingestRequestDto.url}`,
     );
 
-    const job = await this.ingestionService.addIngestionJob(ingestRequestDto.url);
+    const job = await this.ingestionService.addUrlToQueue(ingestRequestDto.url);
 
     this.logger.log(
       `Job ${job.id} successfully added via service for URL: ${ingestRequestDto.url}`,

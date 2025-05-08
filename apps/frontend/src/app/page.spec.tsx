@@ -182,6 +182,7 @@ describe('ChatPage', () => {
       sessionId: string | undefined
     ) => Promise<ChatResponse> = async (
       _query: string,
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       _onChunkCallback: (chunk: { content: string }) => void,
       _sessionId: string | undefined
     ): Promise<ChatResponse> => {
@@ -273,6 +274,7 @@ describe('ChatPage', () => {
     // Mock chatWithBot to return multiple messages
     const firstMessageMock = async (
       _query: string,
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       _onChunk: (chunk: { content: string }) => void,
       _sessionId?: string | undefined
     ): Promise<ChatResponse> => {
@@ -285,6 +287,7 @@ describe('ChatPage', () => {
     }
     const secondMessageMock = async (
       _query: string,
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       _onChunk: (chunk: { content: string }) => void,
       _sessionId?: string | undefined
     ): Promise<ChatResponse> => {
