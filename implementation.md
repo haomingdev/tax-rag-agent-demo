@@ -72,8 +72,8 @@ Each phase includes development steps and corresponding Jest unit tests.
   - [ ] **P1.4.5**: Data Storage:
     - [ ] Implement logic to store `IngestJob`, `RawDoc`, and `DocChunk` (with embeddings) in Weaviate.
     - [ ] Update `IngestJob` status (pending, processing, completed, failed) in Weaviate.
-    - [ ] Write Jest tests for data storage (mocking Weaviate client).
-    - [ ] Run tests (e.g., `npm run test` or `yarn test`) and ensure data storage tests pass.
+    - [X] Write Jest tests for data storage (mocking Weaviate client).
+    - [X] Run tests (e.g., `npm run test` or `yarn test`) and ensure data storage tests pass.
 - [ ] **P1.5**: Implement BullMQ Worker to process ingestion jobs using `IngestionService`.
   - [ ] Handle job success and failure, update `IngestJob` status.
     - [ ] Write Jest tests for the worker logic (mocking `IngestionService`).

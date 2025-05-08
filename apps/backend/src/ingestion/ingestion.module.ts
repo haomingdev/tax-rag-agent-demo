@@ -3,12 +3,14 @@ import { BullModule } from '@nestjs/bullmq';
 import { ConfigModule, ConfigService } from '@nestjs/config'; // ConfigService is still needed for type, ConfigModule can be removed if global
 import { IngestionController } from './ingestion.controller';
 import { IngestionService } from './ingestion.service'; 
+import { WeaviateModule } from '../weaviate/weaviate.module'; // Added import
 // import { IngestionProcessor } from './ingestion.processor'; // For queue worker, will be added later
 
 export const INGESTION_QUEUE_NAME = 'ingestion';
 
 @Module({
   imports: [
+    WeaviateModule, // Added WeaviateModule
     // ConfigModule, // Removed as ConfigModule is global in AppModule
     BullModule.forRootAsync({
       imports: [ConfigModule], // Still need ConfigModule here for useFactory's DI context if not implicitly available

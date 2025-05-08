@@ -146,6 +146,109 @@ export class WeaviateService implements OnModuleInit {
     }
   }
 
+  async createObject(
+    className: string,
+    properties: Record<string, any>,
+    idToSet?: string, // Optional ID to set for the object
+    vector?: number[],
+  ): Promise<string> {
+    let creator = this.client.data
+      .creator()
+      .withClassName(className)
+      .withProperties(properties);
+
+    if (idToSet) {
+      creator = creator.withId(idToSet);
+    }
+    if (vector) {
+      creator = creator.withVector(vector);
+    }
+
+    try {
+      const result = await creator.do();
+      this.logger.log(`Object created in class '${className}' with ID: ${result.id}`);
+      return result.id; // Weaviate returns the full object, we just need the ID here or it's in result.id
+    } catch (err) {
+      this.logger.error(
+        `Failed to create object in class '${className}': ${err.message}`,
+        err.stack,
+      );
+      throw err; // Re-throw the error to be handled by the caller
+    }
+  }
+
+  async getObjectById(className: string, id: string): Promise<any | null> {
+    try {
+      const result = await this.client.data
+        .getterById()
+        .withClassName(className)
+        .withId(id)
+        .do();
+      return result; // This is the full object
+    } catch (err) {
+      // Weaviate client throws an error if object not found, e.g. with status 404
+      // It might be better to check err.statusCode or err.message to specifically identify "not found"
+      this.logger.warn(`Object with ID '${id}' not found in class '${className}': ${err.message}`);
+      return null;
+    }
+  }
+
+  async updateObject(
+    className: string,
+    id: string,
+    propertiesToMerge: Record<string, any>,
+  ): Promise<void> {
+    try {
+      await this.client.data
+        .merger()
+        .withClassName(className)
+        .withId(id)
+        .withProperties(propertiesToMerge)
+        .do();
+      this.logger.log(
+        `Object with ID '${id}' in class '${className}' updated successfully.`,
+      );
+    } catch (err) {
+      this.logger.error(
+        `Failed to update object with ID '${id}' in class '${className}': ${err.message}`,
+        err.stack,
+      );
+      throw err;
+    }
+  }
+
+  async addObjectsBatch(
+    objects: { 
+      className: string; 
+      properties: Record<string, any>; 
+      id?: string; 
+      vector?: number[] 
+    }[],
+  ): Promise<any> { // The return type from Weaviate batch can be complex, using 'any' for now
+    let batcher = this.client.batch.objectsBatcher();
+    for (const obj of objects) {
+      batcher = batcher.withObject({
+        class: obj.className,
+        properties: obj.properties,
+        id: obj.id, // Weaviate's ts-client handles undefined id by auto-generating UUID
+        vector: obj.vector,
+      });
+    }
+
+    try {
+      const results = await batcher.do();
+      this.logger.log(`Batch of ${objects.length} objects added successfully.`);
+      // Results contain status for each object, useful for detailed error handling
+      return results;
+    } catch (err) {
+      this.logger.error(
+        `Failed to add batch of ${objects.length} objects: ${err.message}`,
+        err.stack,
+      );
+      throw err;
+    }
+  }
+
   getClient(): WeaviateClient {
     if (!this.client) {
       this.logger.error('Attempted to get Weaviate client before it was initialized.');

@@ -1,17 +1,23 @@
 import { Injectable, Logger } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { InjectQueue } from '@nestjs/bullmq';
 import { Queue, Job } from 'bullmq';
-import { INGESTION_QUEUE_NAME } from './ingestion.module';
-import { chromium, Browser, Page } from 'playwright'; 
-import axios from 'axios'; 
-import * as pdfParse from 'pdf-parse'; 
+import { v4 as uuidv4 } from 'uuid';
+import * as R from 'ramda';
+import axios from 'axios';
+import pdfParse from 'pdf-parse'; 
 import { extract } from '@extractus/article-extractor';
+import { chromium, Browser, Page } from 'playwright';
+import { Document } from '@langchain/core/documents';
+import { GoogleGenerativeAIEmbeddings } from '@langchain/google-genai';
 import { RecursiveCharacterTextSplitter } from '@langchain/textsplitters';
-import { GoogleGenerativeAIEmbeddings } from "@langchain/google-genai";
-import { ConfigService } from '@nestjs/config';
+import { WeaviateService } from '../weaviate/weaviate.service';
+
+export const INGESTION_QUEUE_NAME = 'ingestion-queue';
 
 export interface IngestionJobData {
   url: string;
+  weaviateJobId: string;
 }
 
 @Injectable()
@@ -21,7 +27,8 @@ export class IngestionService {
   constructor(
     @InjectQueue(INGESTION_QUEUE_NAME) private readonly ingestionQueue: Queue<IngestionJobData>,
     private readonly serviceLogger: Logger,
-    private readonly configService: ConfigService, // Inject ConfigService
+    private readonly configService: ConfigService,
+    private readonly weaviateService: WeaviateService,
   ) {}
 
   async onModuleInit() {
@@ -44,15 +51,34 @@ export class IngestionService {
 
   async addIngestionJob(url: string): Promise<Job<IngestionJobData, any, string>> {
     this.serviceLogger.log(`Adding ingestion job for URL: ${url} to queue ${this.ingestionQueue.name}`);
-    const job = await this.ingestionQueue.add('ingestUrl', { url });
-    this.serviceLogger.log(`Job ${job.id} added to queue ${this.ingestionQueue.name} for URL: ${url}`);
-    return job;
+    
+    const weaviateJobId = uuidv4();
+    const jobProperties = {
+      jobId: weaviateJobId,
+      url: url,
+      status: 'pending',
+      queuedAt: new Date().toISOString(),
+    };
+
+    try {
+      await this.weaviateService.createObject('IngestJob', jobProperties, weaviateJobId);
+      this.serviceLogger.log(`IngestJob ${weaviateJobId} created in Weaviate for URL: ${url}`);
+      
+      const job = await this.ingestionQueue.add('ingestUrl', { url, weaviateJobId });
+      this.serviceLogger.log(`Job ${job.id} (BullMQ ID) / ${weaviateJobId} (Weaviate ID) added to queue ${this.ingestionQueue.name} for URL: ${url}`);
+      return job;
+    } catch (error) {
+      this.serviceLogger.error(
+        `Failed to create IngestJob in Weaviate or add to queue for URL ${url}: ${error.message}`,
+        error.stack,
+      );
+      throw error;
+    }
   }
 
   private async fetchHtmlContent(url: string): Promise<string | null> {
     if (!this.browser) {
       this.serviceLogger.error('Browser not initialized. Cannot fetch HTML content.');
-      // Attempt to re-initialize or throw a more specific error
       try {
         this.serviceLogger.log('Attempting to re-initialize browser...');
         this.browser = await chromium.launch();
@@ -95,7 +121,7 @@ export class IngestionService {
 
   private async cleanHtml(htmlContent: string, url: string): Promise<string | null> {
     try {
-      const article = await extract(htmlContent); // Pass URL for better context if lib uses it - Removed {url} as it's not a valid ParserOption here
+      const article = await extract(htmlContent);
       return article ? article.content : null;
     } catch (error) {
       this.serviceLogger.error(`Error cleaning HTML content for URL ${url}: ${error.message}`, error.stack);
@@ -118,7 +144,7 @@ export class IngestionService {
       return chunks;
     } catch (error) {
       this.serviceLogger.error(`Error during text chunking: ${error.message}`, error.stack);
-      return []; // Return empty array on error as per previous logic
+      return [];
     }
   }
 
@@ -136,7 +162,7 @@ export class IngestionService {
     try {
       const embeddings = new GoogleGenerativeAIEmbeddings({
         apiKey,
-        model: 'models/text-embedding-004', // As specified in implementation.md
+        model: 'models/text-embedding-004',
       });
       const documentEmbeddings = await embeddings.embedDocuments(chunks);
       this.serviceLogger.log(`Successfully generated ${documentEmbeddings.length} embeddings.`);
@@ -150,48 +176,155 @@ export class IngestionService {
     }
   }
 
-  async processUrlForIngestion(url: string): Promise<string | null> {
-    this.serviceLogger.log(`Starting ingestion process for URL: ${url}`);
-    let rawContent: string | null = null;
-    let cleanedText: string | null = null;
+  async processUrlForIngestion(jobData: IngestionJobData): Promise<void> {
+    const { url, weaviateJobId } = jobData;
+    this.serviceLogger.log(
+      `Processing IngestJob ${weaviateJobId} for URL: ${url}`,
+    );
 
-    if (url.endsWith('.pdf')) {
-      rawContent = await this.fetchPdfContent(url);
-      cleanedText = rawContent; // PDF text is used as is for now, or add specific PDF cleaning
-    } else {
-      rawContent = await this.fetchHtmlContent(url);
-      if (rawContent) {
-        cleanedText = await this.cleanHtml(rawContent, url);
+    try {
+      // Update IngestJob status to 'processing'
+      await this.weaviateService.updateObject('IngestJob', weaviateJobId, {
+        status: 'processing',
+        processingStartedAt: new Date().toISOString(),
+      });
+      this.serviceLogger.log(`IngestJob ${weaviateJobId} status updated to 'processing'.`);
+
+      let rawContent: string | null = null;
+      let cleanedText: string | null = null;
+      let documentTitle: string | null = null; // To store the title for RawDoc
+
+      if (url.endsWith('.pdf')) {
+        rawContent = await this.fetchPdfContent(url);
+        cleanedText = rawContent; // PDF text is used as is
+        documentTitle = url.substring(url.lastIndexOf('/') + 1); // Use filename as title for PDF
+      } else {
+        rawContent = await this.fetchHtmlContent(url);
+        if (rawContent) {
+          // Try to extract title along with content if cleanHtml can provide it
+          // For now, assuming cleanHtml just returns content string.
+          // If article-extractor gives title, we can get it there.
+          try {
+            const article = await extract(rawContent);
+            if (article) {
+              cleanedText = article.content;
+              documentTitle = article.title || url; // Fallback to URL if title not found
+            } else {
+              cleanedText = null;
+            }
+          } catch (extractError) {
+            this.serviceLogger.error(`Error extracting article from HTML for ${url}: ${extractError.message}`, extractError.stack);
+            cleanedText = null; // Proceeding without content if extraction fails severely
+          }
+        }
+      }
+
+      if (!cleanedText) {
+        this.serviceLogger.warn(`No content could be cleaned/fetched for URL: ${url} (IngestJob ${weaviateJobId})`);
+        this.serviceLogger.error(`IngestJob ${weaviateJobId} failed: No content could be cleaned or fetched for URL: ${url}`);
+        await this.weaviateService.updateObject('IngestJob', weaviateJobId, {
+          status: 'failed',
+          errorMessage: 'No content could be cleaned or fetched.',
+          completedAt: new Date().toISOString(),
+        });
+        return;
+      }
+      this.serviceLogger.log(`Cleaned text for IngestJob ${weaviateJobId}. Length: ${cleanedText.length}`);
+
+      // 2. Create RawDoc object in Weaviate
+      const rawDocId = uuidv4();
+      const rawDocProperties = {
+        docId: rawDocId,
+        jobId: [{ beacon: `weaviate://localhost/IngestJob/${weaviateJobId}` }], // This needs to be a cross-reference. Assuming Weaviate handles this representation.
+        sourceUrl: url,
+        title: documentTitle || 'Untitled Document',
+        createdAt: new Date().toISOString(),
+      };
+      await this.weaviateService.createObject('RawDoc', rawDocProperties, rawDocId);
+      this.serviceLogger.log(`RawDoc ${rawDocId} created for IngestJob ${weaviateJobId}`);
+
+      const chunks = await this.chunkText(cleanedText);
+      if (!chunks || chunks.length === 0) {
+        this.serviceLogger.warn(`No chunks generated for URL: ${url} (IngestJob ${weaviateJobId})`);
+        this.serviceLogger.error(`IngestJob ${weaviateJobId} failed: No chunks were generated from the content for URL: ${url}`);
+        await this.weaviateService.updateObject('IngestJob', weaviateJobId, {
+          status: 'failed',
+          errorMessage: 'No chunks were generated from the content.',
+          completedAt: new Date().toISOString(),
+        });
+        return;
+      }
+      this.serviceLogger.log(`Generated ${chunks.length} chunks for IngestJob ${weaviateJobId}.`);
+
+      const embeddings = await this.generateEmbeddings(chunks);
+      if (!embeddings || embeddings.length !== chunks.length) {
+        this.serviceLogger.warn(`Failed to generate embeddings or count mismatch for IngestJob ${weaviateJobId}`);
+        this.serviceLogger.error(`IngestJob ${weaviateJobId} failed: Failed to generate embeddings or embedding count mismatch for URL: ${url}`);
+        await this.weaviateService.updateObject('IngestJob', weaviateJobId, {
+          status: 'failed',
+          errorMessage: 'Failed to generate embeddings or embedding count mismatch.',
+          completedAt: new Date().toISOString(),
+        });
+        return;
+      }
+      this.serviceLogger.log(`Embeddings generated for IngestJob ${weaviateJobId}. Count: ${embeddings.length}.`);
+
+      // 3. Create ContentChunk objects in Weaviate (batch operation)
+      const createChunkPromises = chunks.map((chunkText, index) => {
+        const chunkId = uuidv4();
+        const chunkProperties = {
+          chunkId: chunkId,
+          docId: [{ beacon: `weaviate://localhost/RawDoc/${rawDocId}` }],
+          jobId: [{ beacon: `weaviate://localhost/IngestJob/${weaviateJobId}` }],
+          text: chunkText,
+          url: url, // Store original URL with each chunk
+          docTitle: documentTitle || 'Untitled Document', // Store document title
+          // vector: embeddings[index], // Weaviate handles auto-vectorization if module is configured
+        };
+        return this.weaviateService.createObject(
+          'ContentChunk',
+          chunkProperties,
+          chunkId,
+          embeddings[index], // Pass vector here for manual vectorization
+        );
+      });
+
+      await Promise.all(createChunkPromises);
+      this.serviceLogger.log(`All ${chunks.length} ContentChunk objects created for IngestJob ${weaviateJobId}.`);
+
+      // 4. Update IngestJob status to 'completed'
+      await this.weaviateService.updateObject('IngestJob', weaviateJobId, {
+        status: 'completed',
+        completedAt: new Date().toISOString(),
+        errorMessage: null, // Clear any previous error message
+      });
+      this.serviceLogger.log(`IngestJob ${weaviateJobId} completed successfully for URL: ${url}.`);
+    } catch (error) {
+      this.serviceLogger.error(
+        `Unhandled error processing IngestJob ${weaviateJobId} for URL ${url}: ${error.message}`,
+        error.stack,
+      );
+      // Determine a more specific error message if possible
+      let finalErrorMessage = error.message || 'An unexpected error occurred during ingestion.';
+      if (error.message && error.message.includes('Weaviate createObject for ContentChunk failed')) { // Check if it's our specific error for ContentChunk
+        finalErrorMessage = `Error creating ContentChunk in Weaviate: ${error.message}`; // Keep original for a bit more detail
+      } else if (error.message && error.message.includes('Weaviate createObject failed')) { // Generic createObject failure
+         finalErrorMessage = `Error creating an object in Weaviate: ${error.message}`;
+      }
+
+      // Ensure job status is updated to failed even for unexpected errors
+      try {
+        await this.weaviateService.updateObject('IngestJob', weaviateJobId, {
+          status: 'failed',
+          errorMessage: finalErrorMessage,
+          completedAt: new Date().toISOString(),
+        });
+      } catch (updateError) {
+        this.serviceLogger.error(
+          `Failed to update IngestJob ${weaviateJobId} status to failed after an unhandled error: ${updateError.message}`,
+          updateError.stack,
+        );
       }
     }
-
-    if (!cleanedText) {
-      this.serviceLogger.warn(`No content could be cleaned or fetched for URL: ${url}`);
-      return null;
-    }
-
-    this.serviceLogger.log(`Successfully cleaned text for URL: ${url}. Length: ${cleanedText.length}`);
-    
-    const chunks = await this.chunkText(cleanedText);
-    if (!chunks || chunks.length === 0) {
-      this.serviceLogger.warn(`No chunks were generated for URL: ${url}. Aborting further processing.`);
-      // Depending on desired behavior, might still return the cleanedText or null
-      return null; 
-    }
-    this.serviceLogger.log(`Generated ${chunks.length} chunks for URL: ${url}. First chunk: "${chunks[0].substring(0,100)}..."`);
-
-    const embeddings = await this.generateEmbeddings(chunks);
-    if (!embeddings) {
-      this.serviceLogger.warn(`Failed to generate embeddings for URL: ${url}.`);
-      // Decide if this is a critical failure stopping ingestion or if we proceed without embeddings
-      return null; // For now, treat as critical
-    }
-
-    // Placeholder for where embeddings would be stored or processed further
-    this.serviceLogger.log(`Embeddings generated for ${url}. Count: ${embeddings.length}.`);
-
-    // For now, returning the first chunk as an indication of success, or cleanedText.
-    // Later, this method will likely return a status or an ID of the ingested document.
-    return cleanedText; // Or chunks[0] or some other indicator
   }
 }
