@@ -4,7 +4,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config'; // ConfigService i
 import { IngestionController } from './ingestion.controller';
 import { IngestionService } from './ingestion.service'; 
 import { WeaviateModule } from '../weaviate/weaviate.module'; // Added import
-// import { IngestionProcessor } from './ingestion.processor'; // For queue worker, will be added later
+import { IngestionProcessor } from './ingestion.processor'; // For queue worker
 
 export const INGESTION_QUEUE_NAME = 'ingestion';
 
@@ -41,7 +41,7 @@ export const INGESTION_QUEUE_NAME = 'ingestion';
   controllers: [IngestionController],
   providers: [
     IngestionService, 
-    // IngestionProcessor, // Will be added later
+    IngestionProcessor, 
     Logger,
   ],
   exports: [IngestionService], 
