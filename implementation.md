@@ -61,14 +61,14 @@ Each phase includes development steps and corresponding Jest unit tests.
     - [x] Basic text cleaning.
     - [x] Write Jest tests for text parsing and cleaning.
     - [x] Run tests (e.g., `npm run test` or `yarn test`) and ensure text parsing/cleaning tests pass.
-  - [ ] **P1.4.3**: Text Chunking:
-    - [ ] Implement text chunking using LangChain text splitters (e.g., `RecursiveCharacterTextSplitter`).
-    - [ ] Write Jest tests for text chunking.
-    - [ ] Run tests (e.g., `npm run test` or `yarn test`) and ensure text chunking tests pass.
-  - [ ] **P1.4.4**: Embedding Generation:
-    - [ ] Implement embedding generation for text chunks using `GoogleGenerativeAIEmbeddings` (`models/text-embedding-004`) with the Gemini API Key.
-    - [ ] Write Jest tests for embedding generation (mocking the embedding API call).
-    - [ ] Run tests (e.g., `npm run test` or `yarn test`) and ensure embedding generation tests pass.
+  - [X] **P1.4.3**: Text Chunking:
+    - [X] Implement text chunking using LangChain text splitters (e.g., `RecursiveCharacterTextSplitter`).
+    - [X] Write Jest tests for text chunking.
+    - [X] Run tests (e.g., `npm run test` or `yarn test`) and ensure text chunking tests pass.
+  - [X] **P1.4.4**: Embedding Generation:
+    - [X] Implement embedding generation for text chunks using `GoogleGenerativeAIEmbeddings` (`models/text-embedding-004`) with the Gemini API Key.
+    - [X] Write Jest tests for embedding generation (mocking the embedding API call).
+    - [X] Run tests (e.g., `npm run test` or `yarn test`) and ensure embedding generation tests pass.
   - [ ] **P1.4.5**: Data Storage:
     - [ ] Implement logic to store `IngestJob`, `RawDoc`, and `DocChunk` (with embeddings) in Weaviate.
     - [ ] Update `IngestJob` status (pending, processing, completed, failed) in Weaviate.

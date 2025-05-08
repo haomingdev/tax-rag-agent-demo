@@ -21,6 +21,7 @@
   },
   "dependencies": {
     "@extractus/article-extractor": "^8.0.18",
+    "@langchain/google-genai": "^0.2.7",
     "@langchain/textsplitters": "^0.1.0",
     "@nestjs/bullmq": "^11.0.2",
     "@nestjs/common": "^10.0.0",
